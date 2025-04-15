@@ -1,21 +1,22 @@
-# Imagen base de Ubuntu con soporte para x86_64
 FROM ubuntu:20.04
 
-# Instalamos dependencias necesarias
+# Evitar interacciones
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Instalar dependencias necesarias para correr Unity headless builds
 RUN apt-get update && \
     apt-get install -y libglib2.0-0 libnss3 libgconf-2-4 libxi6 libxcursor1 libxrandr2 libxss1 libxtst6 && \
     apt-get clean
 
-# Copiamos los archivos del servidor al contenedor
-COPY . /app
+# Crear carpeta app y copiar todo
 WORKDIR /app
+COPY . /app
 
-# Damos permisos de ejecución
-RUN chmod +x juego.x86_64
+# Dar permisos de ejecución al binario
+RUN chmod +x ./juego.x86_64
 
-# Exponemos el puerto (ajústalo al puerto que usas en Mirror)
+# Exponer el puerto (ajusta si usas otro)
 EXPOSE 7777
 
 # Comando para ejecutar el servidor en modo headless
 CMD ["./juego.x86_64", "-batchmode", "-nographics", "-logfile", "/dev/stdout"]
-
