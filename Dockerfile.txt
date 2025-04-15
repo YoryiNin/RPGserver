@@ -1,22 +1,26 @@
 FROM ubuntu:20.04
 
-# Evitar interacciones
-ENV DEBIAN_FRONTEND=noninteractive
+# Instalar dependencias necesarias
+RUN apt-get update && apt-get install -y \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrandr2 \
+    libxi6 \
+    libxcursor1 \
+    libxinerama1 \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
-# Instalar dependencias necesarias para correr Unity headless builds
-RUN apt-get update && \
-    apt-get install -y libglib2.0-0 libnss3 libgconf-2-4 libxi6 libxcursor1 libxrandr2 libxss1 libxtst6 && \
-    apt-get clean
-
-# Crear carpeta app y copiar todo
+# Copiar los archivos del build al contenedor
 WORKDIR /app
 COPY . /app
 
-# Dar permisos de ejecución al binario
-RUN chmod +x ./juego.x86_64
+# Dar permisos de ejecución
+RUN chmod +x juego.x86_64
 
-# Exponer el puerto (ajusta si usas otro)
+# Exponer el puerto de Mirror (por defecto 7777)
 EXPOSE 7777
 
-# Comando para ejecutar el servidor en modo headless
+# Comando para ejecutar el servidor headless
 CMD ["./juego.x86_64", "-batchmode", "-nographics", "-logfile", "/dev/stdout"]
