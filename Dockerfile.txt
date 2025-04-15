@@ -1,21 +1,30 @@
-# Imagen base de Ubuntu con soporte para x86_64
+# Usar una imagen base de Ubuntu para el contenedor
 FROM ubuntu:20.04
 
-# Instalamos dependencias necesarias
-RUN apt-get update && \
-    apt-get install -y libglib2.0-0 libnss3 libgconf-2-4 libxi6 libxcursor1 libxrandr2 libxss1 libxtst6 && \
-    apt-get clean
+# Instalar dependencias necesarias para Unity headless
+RUN apt-get update && apt-get install -y \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrandr2 \
+    libxi6 \
+    libxcursor1 \
+    libxinerama1 \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copiamos los archivos del servidor al contenedor
-COPY . /app
+# Establecer el directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# Damos permisos de ejecución
+# Copiar los archivos generados en el build de Unity al contenedor
+COPY . /app
+
+# Dar permisos de ejecución al ejecutable de Unity
 RUN chmod +x juego.x86_64
 
-# Exponemos el puerto (ajústalo al puerto que usas en Mirror)
+# Exponer el puerto que usará el juego para la conexión (usualmente 7777)
 EXPOSE 7777
 
-# Comando para ejecutar el servidor en modo headless
+# Iniciar el servidor headless con Unity
 CMD ["./juego.x86_64", "-batchmode", "-nographics", "-logfile", "/dev/stdout"]
 
